@@ -1,5 +1,9 @@
 image:
   file: .gitpod.Dockerfile
+tasks:
+ - name: Setup environment variables for Rust
+   command: |
+     source /home/gitpod/export-esp.sh
 vscode:
   extensions:
     - matklad.rust-analyzer

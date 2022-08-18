@@ -32,10 +32,11 @@ ADD --chown=${CONTAINER_USER}:${CONTAINER_GROUP} \
 RUN chmod a+x ${INSTALL_RUST_TOOLCHAIN} \
     && ./${INSTALL_RUST_TOOLCHAIN} \
     --extra-crates "ldproxy cargo-espflash wokwi-server web-flash" \
-    --clear-cache "YES"\
+    --clear-cache "YES" --export-file /home/${CONTAINER_USER}/export-esp.sh \
     --build-target "${ESP_BOARD}" \
     && rustup component add clippy rustfmt
 
 # Activate ESP environment
+RUN echo "source /home/${CONTAINER_USER}/export-esp.sh" >> ~/.bashrc
 
 CMD [ "/bin/bash" ]
