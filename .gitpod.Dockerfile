@@ -7,12 +7,12 @@ ENV LANG=C.UTF-8
 ARG CONTAINER_USER=gitpod
 ARG CONTAINER_GROUP=gitpod
 ARG TOOLCHAIN_VERSION=1.62.1.0
-ARG ESP_BOARD=esp32c3
+ARG ESP_BOARD=esp32s2
 ARG INSTALL_RUST_TOOLCHAIN=install-rust-toolchain.sh
 
 # Install dependencies
-RUN sudo install-packages git curl libudev-dev libpython2.7 \
-                                libusb-1.0-0 libssl-dev pkg-config libtinfo5
+RUN sudo install-packages git curl gcc ninja-build libudev-dev libpython2.7 \
+    python3 python3-pip python3-venv libusb-1.0-0 libssl-dev pkg-config libtinfo5 clang
 # Set User
 USER ${CONTAINER_USER}
 WORKDIR /home/${CONTAINER_USER}
@@ -26,7 +26,7 @@ ADD --chown=${CONTAINER_USER}:${CONTAINER_GROUP} \
     
 RUN chmod a+x ${INSTALL_RUST_TOOLCHAIN} \
     && ./${INSTALL_RUST_TOOLCHAIN} \
-    --extra-crates "cargo-espflash wokwi-server web-flash" \
+    --extra-crates "ldproxy cargo-espflash wokwi-server web-flash" \
     --clear-cache "YES" --export-file /home/${CONTAINER_USER}/export-esp.sh \
     --build-target "${ESP_BOARD}" \
     && rustup component add clippy rustfmt
