@@ -1,5 +1,5 @@
 [package]
-name = "rust-project"
+name = "esp-hello-display"
 version = "0.1.0"
 authors = ["Kirill Mikhailov <playfulfence@gmail.com>"]
 edition = "2021"
