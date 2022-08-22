@@ -13,7 +13,7 @@ fi
 
 case "$1" in
     ""|"release")
-        cargo build --target riscv32imac-unknown-none-elf
+        cargo build --release --target riscv32imac-unknown-none-elf
         ;;
     "debug")
         cargo build --features wifi
