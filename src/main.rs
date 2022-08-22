@@ -104,35 +104,35 @@ fn main() -> ! {
 
     /* Set corresponding pins */
     #[cfg(feature = "esp32")]
-    let mosi = io.pins.gpio7;
+    let mosi = io.pins.gpio23;
     #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
     let mosi = io.pins.gpio21;
     #[cfg(feature = "esp32c3")]
     let mosi = io.pins.gpio7;
 
     #[cfg(feature = "esp32")]
-    let cs = io.pins.gpio2;
+    let cs = io.pins.gpio15;
     #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
     let cs = io.pins.gpio9;
     #[cfg(feature = "esp32c3")]
     let cs = io.pins.gpio20;
 
     #[cfg(feature = "esp32")]
-    let rst = io.pins.gpio10;
+    let rst = io.pins.gpio4;
     #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
     let rst = io.pins.gpio0;
     #[cfg(feature = "esp32c3")]
     let rst = io.pins.gpio3;
 
     #[cfg(feature = "esp32")]
-    let dc = io.pins.gpio3;
+    let dc = io.pins.gpio2;
     #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
     let dc = io.pins.gpio1;
     #[cfg(feature = "esp32c3")]
     let dc = io.pins.gpio21;
 
     #[cfg(feature = "esp32")]
-    let sck = io.pins.gpio6;
+    let sck = io.pins.gpio18;
     #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
     let sck = io.pins.gpio8;
     #[cfg(feature = "esp32c3")]
@@ -146,7 +146,7 @@ fn main() -> ! {
     let miso = io.pins.gpio8;
 
     #[cfg(feature = "esp32")]
-    let mut backlight = io.pins.gpio4.into_push_pull_output();
+    let mut backlight = io.pins.gpio17.into_push_pull_output();
     #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
     let mut backlight = io.pins.gpio20.into_push_pull_output();
     #[cfg(feature = "esp32c3")]
@@ -160,7 +160,7 @@ fn main() -> ! {
     /* Configure SPI */
     #[cfg(feature = "esp32")]
     let spi = spi::Spi::new(
-        peripherals.SPI2,
+        peripherals.SPI3,
         sck,
         mosi,
         miso,

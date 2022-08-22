@@ -13,7 +13,7 @@ fi
 
 case "$1" in
     ""|"release")
-        cargo build --target xtensa-esp32-none-elf
+        cargo build --release --target xtensa-esp32-none-elf
         ;;
     "debug")
         cargo build --features wifi
