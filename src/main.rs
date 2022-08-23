@@ -24,6 +24,8 @@ use hal::{
 /* Display and graphics */
 #[cfg(feature = "ili9341")]
 use ili9341::{DisplaySize240x320, Ili9341, Orientation};
+#[cfg(feature = "st7789")]
+use st7789::*;
 
 use display_interface_spi::SPIInterfaceNoCS;
 
@@ -36,7 +38,7 @@ use embedded_graphics::image::Image;
 use embedded_graphics::geometry::*;
 use embedded_graphics::draw_target::DrawTarget;
 
-use profont::{PROFONT_24_POINT};
+use profont::{PROFONT_24_POINT, PROFONT_18_POINT};
 
 
 
@@ -104,63 +106,63 @@ fn main() -> ! {
 
     /* Set corresponding pins */
     #[cfg(feature = "esp32")]
-    let mosi = io.pins.gpio7;
+    let mosi = io.pins.gpio23;
     #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
-    let mosi = io.pins.gpio21;
+    let mosi = io.pins.gpio7;
     #[cfg(feature = "esp32c3")]
     let mosi = io.pins.gpio7;
 
     #[cfg(feature = "esp32")]
-    let cs = io.pins.gpio2;
+    let cs = io.pins.gpio22;
     #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
-    let cs = io.pins.gpio9;
+    let cs = io.pins.gpio5;
     #[cfg(feature = "esp32c3")]
     let cs = io.pins.gpio20;
 
     #[cfg(feature = "esp32")]
-    let rst = io.pins.gpio10;
+    let rst = io.pins.gpio18;
     #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
-    let rst = io.pins.gpio0;
+    let rst = io.pins.gpio18;
     #[cfg(feature = "esp32c3")]
     let rst = io.pins.gpio3;
 
     #[cfg(feature = "esp32")]
-    let dc = io.pins.gpio3;
+    let dc = io.pins.gpio21;
     #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
-    let dc = io.pins.gpio1;
-    #[cfg(feature = "esp32c3")]
+    let dc = io.pins.gpio4;
+    #[cfg(feature = "esp32c3")] 
     let dc = io.pins.gpio21;
 
     #[cfg(feature = "esp32")]
-    let sck = io.pins.gpio6;
+    let sck = io.pins.gpio19;
     #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
-    let sck = io.pins.gpio8;
+    let sck = io.pins.gpio6;
     #[cfg(feature = "esp32c3")]
     let sck = io.pins.gpio6;
 
     #[cfg(feature = "esp32")]
-    let miso = io.pins.gpio8;
+    let miso = io.pins.gpio25;
     #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
-    let miso = io.pins.gpio4;
+    let miso = io.pins.gpio12;
     #[cfg(feature = "esp32c3")]
     let miso = io.pins.gpio8;
 
     #[cfg(feature = "esp32")]
-    let mut backlight = io.pins.gpio4.into_push_pull_output();
+    let mut backlight = io.pins.gpio5.into_push_pull_output();
     #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
-    let mut backlight = io.pins.gpio20.into_push_pull_output();
+    let mut backlight = io.pins.gpio9.into_push_pull_output();
     #[cfg(feature = "esp32c3")]
     let mut backlight = io.pins.gpio0.into_push_pull_output();
 
     /* Then set backlight (set_low() - display lights up when signal is in 0, set_high() - opposite case(for example.)) */
     let mut backlight = backlight.into_push_pull_output();
-    backlight.set_low().unwrap();
+    //backlight.set_low().unwrap();
 
 
     /* Configure SPI */
     #[cfg(feature = "esp32")]
     let spi = spi::Spi::new(
-        peripherals.SPI2,
+        peripherals.SPI3,
         sck,
         mosi,
         miso,
@@ -198,12 +200,28 @@ fn main() -> ! {
     let di = SPIInterfaceNoCS::new(spi, dc.into_push_pull_output());
     let reset = rst.into_push_pull_output();
     let mut delay = Delay::new(&clocks);
+    #[cfg(feature = "ili9341")]
     let mut display = Ili9341::new(di, reset, &mut delay, KalugaOrientation::Landscape, DisplaySize240x320).unwrap();
+    #[cfg(feature = "st7789")]
+    let mut display = st7789::ST7789::new(di, reset, 240, 240);
+
+    #[cfg(feature = "st7789")]
+    display.init(&mut delay).unwrap();
+    #[cfg(feature = "st7789")]
+    display.set_orientation(st7789::Orientation::Portrait).unwrap();
+    
 
     println!("Initialized");
 
     display.clear(Rgb565::WHITE).unwrap();
 
+    #[cfg(feature = "st7789")]
+    Text::new("Display initialized",
+              display.bounding_box().center() - Size::new(display.bounding_box().size.width/2 - 10, 0), 
+              MonoTextStyle::new(&PROFONT_18_POINT, Rgb565::BLACK))
+    .draw(&mut display)
+    .unwrap();
+    #[cfg(feature = "ili9341")]
     Text::new("Display initialized",
               display.bounding_box().center() - Size::new(display.bounding_box().size.width/2 - 10, 0), 
               MonoTextStyle::new(&PROFONT_24_POINT, Rgb565::BLACK))
