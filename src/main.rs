@@ -65,7 +65,7 @@ impl ili9341::Mode for KalugaOrientation {
             Self::LandscapeVericallyFlipped => 0x20,
             Self::Landscape => 0x20 | 0x40,
             Self::PortraitFlipped => 0x80 | 0x40,
-            Self::LandscapeFlipped => 0x80 | 0x20,
+            Self::LandscapeFlipped => 0x80 | 0x20 | 0x08,
         }
     }
 
@@ -198,7 +198,7 @@ fn main() -> ! {
     let di = SPIInterfaceNoCS::new(spi, dc.into_push_pull_output());
     let reset = rst.into_push_pull_output();
     let mut delay = Delay::new(&clocks);
-    let mut display = Ili9341::new(di, reset, &mut delay, KalugaOrientation::Landscape, DisplaySize240x320).unwrap();
+    let mut display = Ili9341::new(di, reset, &mut delay, KalugaOrientation::LandscapeFlipped, DisplaySize240x320).unwrap();
 
     println!("Initialized");
 
