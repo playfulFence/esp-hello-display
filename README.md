@@ -1,5 +1,64 @@
-# esp-hello-display
+# esp-hello-display :crab:
 Wokwi-example how the display is initialised for different boards
+
+## Description
+There's a short example for newcomers that shows, how the display is initialised on different Espressif boards (ESP32, ESP32S2, ESP32C3) in bare-metal
+Initially, there were three examples on Wokwi only (without Gitpod), but it requires local builder, what is relatively difficult to explain to newcomer (I'll do a separate repository for this one day).
+Anyway, we're already working on including [esp-hal](https://github.com/esp-rs/esp-hal) drivers for building it in Wokwi without using local builder, so you need just to wait a little :heart:
+
+## Some screenshots
+
+### ESP32
+Connection of ESP32 board with ILI9341 display
+
+#### Used pins
+| ILI9341 |        ESP32        |
+----------|---------------------|
+| RST     | GPIO18              |
+| CLK     | GPIO19              |
+| D_C     | GPIO21              |
+| CS      | GPIO22              |
+| MOSI    | GPIO23              |
+| BCLT    | GPIO4               |
+<br>
+
+<a data-flickr-embed="true" href="https://www.flickr.com/photos/196173186@N08/52308469558/in/dateposted-public/" title="esp32-display"><img src="https://live.staticflickr.com/65535/52308469558_3674326516_c.jpg" width="555" height="543" alt="esp32-display"></a>
+
+
+### ESP32-S2 
+Connection of ESP32-S2 board with ILI9341 display
+
+#### Used pins
+| ILI9341 |       ESP32-S2      |
+----------|---------------------|
+| RST     | GPIO18              |
+| CLK     | GPIO6               |
+| D_C     | GPIO4               |
+| CS      | GPIO5               |
+| MOSI    | GPIO7               |
+| BCLT    | GPIO9               |
+<br>
+
+<a data-flickr-embed="true" href="https://www.flickr.com/photos/196173186@N08/52308469548/in/dateposted-public/" title="ESP32S2-display"><img src="https://live.staticflickr.com/65535/52308469548_4263930304_c.jpg" width="555" height="534" alt="ESP32S2-display"></a>
+
+### ESP32-C3
+Connection of ESP32-C3 board with ILI9341 display
+
+#### Used pins
+| ILI9341 |      ESP32-C3       |
+----------|---------------------|
+| RST     | GPIO3               |
+| CLK     | GPIO6               |
+| D_C     | GPIO21              |
+| CS      | GPIO20              |
+| MOSI    | GPIO7               |
+| BCLT    | GPIO0               |
+<br>
+
+<a data-flickr-embed="true" href="https://www.flickr.com/photos/196173186@N08/52308014146/in/dateposted-public/" title="ESP32C3-display"><img src="https://live.staticflickr.com/65535/52308014146_85ccd94b38_c.jpg" width="555" height="534" alt="ESP32C3-display"></a>
+
+
+
 
 ## Dev Containers
 This repository offers Dev Containers supports for:
