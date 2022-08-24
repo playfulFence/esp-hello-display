@@ -56,7 +56,7 @@ Connection of ESP32-C3 board with ILI9341 display
 | BCLT    | GPIO0               |
 <br>
 
-<a data-flickr-embed="true" href="https://www.flickr.com/photos/196173186@N08/52308014146/in/dateposted-public/" title="ESP32C3-display"><img src="https://live.staticflickr.com/65535/52308014146_85ccd94b38_c.jpg" width="555" height="500" alt="ESP32C3-display"></a>
+<a data-flickr-embed="true" href="https://www.flickr.com/photos/196173186@N08/52308014146/in/dateposted-public/" title="ESP32C3-display"><img src="https://live.staticflickr.com/65535/52308014146_85ccd94b38_c.jpg" width="570" height="500" alt="ESP32C3-display"></a>
 
 
 
