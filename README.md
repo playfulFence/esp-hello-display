@@ -40,7 +40,7 @@ Connection of ESP32-S2 board with ILI9341 display
 | BCLT    | GPIO9               |
 <br>
 
-<a data-flickr-embed="true" href="https://www.flickr.com/photos/196173186@N08/52308469548/in/dateposted-public/" title="ESP32S2-display"><img src="https://live.staticflickr.com/65535/52308469548_4263930304_c.jpg" width="555" height="534" alt="ESP32S2-display"></a>
+<a data-flickr-embed="true" href="https://www.flickr.com/photos/196173186@N08/52308469548/in/dateposted-public/" title="ESP32S2-display"><img src="https://live.staticflickr.com/65535/52308469548_4263930304_c.jpg" width="545" height="534" alt="ESP32S2-display"></a>
 
 ### ESP32-C3
 Connection of ESP32-C3 board with ILI9341 display
