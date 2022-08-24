@@ -7,6 +7,8 @@ Initially, there were three examples on Wokwi only (without Gitpod), but it requ
 <br>
 Anyway, we're already working on including [esp-hal](https://github.com/esp-rs/esp-hal) drivers for building it in Wokwi without using local builder, so you need just to wait a little :heart:
 
+>### **Important** : below in this branch you can find pin connection for REAL hardware, not for Wokwi. Pin connection for every chip for Wokwi can be found in corresponding branches
+
 ## Some screenshots
 
 ### ESP32 
@@ -25,6 +27,8 @@ Connection of ESP32 board with ILI9341 display
 
 <a data-flickr-embed="true" href="https://www.flickr.com/photos/196173186@N08/52308469558/in/dateposted-public/" title="esp32-display"><img src="https://live.staticflickr.com/65535/52308469558_3674326516_c.jpg" width="555" height="543" alt="esp32-display"></a>
 
+>### [Corresponding Wokwi project](https://wokwi.com/projects/340062796817367636)
+<br>
 
 ### ESP32-S2 
 Connection of ESP32-S2 board with ILI9341 display
@@ -42,6 +46,9 @@ Connection of ESP32-S2 board with ILI9341 display
 
 <a data-flickr-embed="true" href="https://www.flickr.com/photos/196173186@N08/52308469548/in/dateposted-public/" title="ESP32S2-display"><img src="https://live.staticflickr.com/65535/52308469548_4263930304_c.jpg" width="545" height="534" alt="ESP32S2-display"></a>
 
+>### [Corresponding Wokwi project](https://wokwi.com/projects/338804923638481490)
+<br>
+
 ### ESP32-C3
 Connection of ESP32-C3 board with ILI9341 display
 
@@ -58,8 +65,8 @@ Connection of ESP32-C3 board with ILI9341 display
 
 <a data-flickr-embed="true" href="https://www.flickr.com/photos/196173186@N08/52308014146/in/dateposted-public/" title="ESP32C3-display"><img src="https://live.staticflickr.com/65535/52308014146_85ccd94b38_c.jpg" width="570" height="500" alt="ESP32C3-display"></a>
 
-
-
+>### [Corresponding Wokwi project](https://wokwi.com/projects/340062891526849108)
+<br>
 
 ## Dev Containers
 This repository offers Dev Containers supports for:
