@@ -14,7 +14,7 @@ opt-level = "z"
 
 [target.xtensa-esp32-none-elf.dependencies]
 xtensa-atomic-emulation-trap = "0.2.0"
-esp32-hal = { package = "esp32-hal", git = "https://github.com/esp-rs/esp-hal.git", rev = "6e037b0" }
+esp32-hal = { package = "esp32-hal", git = "https://github.com/esp-rs/esp-hal.git" }
 esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", features = [
     "esp32",
     "panic-handler",
@@ -25,17 +25,28 @@ esp-println = { version = "0.2.1", features = [ "esp32" ] }
 
 [target.xtensa-esp32s2-none-elf.dependencies]
 xtensa-atomic-emulation-trap = "0.2.0"
-esp32s2-hal = { package = "esp32s2-hal", git = "https://github.com/esp-rs/esp-hal.git", rev = "6e037b0" }
+esp32s2-hal = { package = "esp32s2-hal", git = "https://github.com/esp-rs/esp-hal.git" }
 esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", features = [
     "esp32s2",
     "panic-handler",
     "print-uart",
 ] }
-xtensa-lx-rt = { version = "0.12.0", features = ["esp32s2"], optional = true }
+xtensa-lx-rt = { version = "0.13.0", features = ["esp32s2"], optional = true }
 esp-println = { version = "0.2.1", features = [ "esp32s2" ] }
 
+[target.xtensa-esp32s3-none-elf.dependencies]
+xtensa-atomic-emulation-trap = "0.2.0"
+esp32s3-hal = { package = "esp32s3-hal", git = "https://github.com/esp-rs/esp-hal.git" }
+esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", features = [
+    "esp32s3",
+    "panic-handler",
+    "print-uart",
+] }
+xtensa-lx-rt = { version = "0.12.0", features = ["esp32s3"], optional = true }
+esp-println = { version = "0.2.1", features = [ "esp32s3" ] }
+
 [target.riscv32imac-unknown-none-elf.dependencies]
-esp32c3-hal = { package = "esp32c3-hal", git = "https://github.com/esp-rs/esp-hal.git", rev = "6e037b0" }
+esp32c3-hal = { package = "esp32c3-hal", git = "https://github.com/esp-rs/esp-hal.git" }
 esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", features = [
     "esp32c3",
     "panic-handler",
@@ -43,6 +54,7 @@ esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", features = [
 ] }
 riscv-rt = { version = "0.8", optional = true }
 esp-println = { version = "0.2.1", features = [ "esp32c3" ] }
+
 
 
 [dependencies]
