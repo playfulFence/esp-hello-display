@@ -1,6 +1,8 @@
 # esp-hello-display :crab:
 Wokwi-example how the display is initialised for different boards
 
+ >### **Important** : We updated the builder for Wokwi and example is now available on multiple chips directly from your browser (without gitpod)! Visit the `Corresponding Wokwi project` links under the screenshots below and try it!
+
 ## Description
 There's a short example for newcomers that shows, how the display is initialised on different Espressif boards (ESP32, ESP32S2, ESP32C3) in bare-metal <br>
 Initially, there were three examples on Wokwi only (without Gitpod), but it requires local builder, what is relatively difficult to explain to newcomer (I'll do a separate repository for this one day). 
