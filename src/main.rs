@@ -12,20 +12,20 @@ use esp32c3_hal as hal;
 
 use hal::{
     clock::ClockControl,
-    pac::Peripherals,
+    peripherals::Peripherals,
+    dma::DmaPriority,
+    gdma::Gdma,
     prelude::*,
-    spi,
+    spi::{dma::WithDmaSpi2, Spi, SpiMode},
+    systimer::SystemTimer,
     timer::TimerGroup,
     Rtc,
     IO,
     Delay,
 };
 
-/* Display and graphics */
-#[cfg(feature = "ili9341")]
-use ili9341::{DisplaySize240x320, Ili9341, Orientation};
-#[cfg(feature = "st7789")]
-use st7789::*;
+use mipidsi::Orientation;
+
 
 use display_interface_spi::SPIInterfaceNoCS;
 
@@ -37,8 +37,12 @@ use embedded_graphics::text::*;
 use embedded_graphics::image::Image;
 use embedded_graphics::geometry::*;
 use embedded_graphics::draw_target::DrawTarget;
+use embedded_graphics::mono_font::{ascii::FONT_10X20, MonoTextStyleBuilder};
 
 use profont::{PROFONT_24_POINT, PROFONT_18_POINT};
+
+use core::f32::consts::PI;
+use libm::{sin, cos};
 
 
 
@@ -51,35 +55,10 @@ use esp_println::println;
 use esp_backtrace as _;
 
 
-/* Some stuff for correct orientation and color on ILI9341 */
-pub enum KalugaOrientation {
-    Portrait,
-    PortraitFlipped,
-    Landscape,
-    LandscapeVericallyFlipped,
-    LandscapeFlipped,
-}
-
-impl ili9341::Mode for KalugaOrientation {
-    fn mode(&self) -> u8 {
-        match self {
-            Self::Portrait => 0,
-            Self::LandscapeVericallyFlipped => 0x20,
-            Self::Landscape => 0x20 | 0x40,
-            Self::PortraitFlipped => 0x80 | 0x40,
-            Self::LandscapeFlipped => 0x80 | 0x20,
-        }
-    }
-
-    fn is_landscape(&self) -> bool {
-        matches!(self, Self::Landscape | Self::LandscapeFlipped | Self::LandscapeVericallyFlipped)
-    }
-}
-
 
 #[entry]
 fn main() -> ! {
-    let peripherals = Peripherals::take().unwrap();
+    let peripherals = Peripherals::take();
 
     #[cfg(any(feature = "esp32"))]
     let mut system = peripherals.DPORT.split();
@@ -102,6 +81,13 @@ fn main() -> ! {
 
     println!("About to initialize the SPI LED driver ILI9341");
     let io = IO::new(peripherals.GPIO, peripherals.IO_MUX);
+
+
+    let dma = Gdma::new(peripherals.DMA, &mut system.peripheral_clock_control);
+    let dma_channel = dma.channel0;
+
+    let mut descriptors = [0u32; 8 * 3];
+    let mut rx_descriptors = [0u32; 8 * 3];
     
 
     /* Set corresponding pins */
@@ -156,7 +142,7 @@ fn main() -> ! {
 
     /* Then set backlight (set_low() - display lights up when signal is in 0, set_high() - opposite case(for example.)) */
     let mut backlight = backlight.into_push_pull_output();
-    //backlight.set_low().unwrap();
+    backlight.set_low().unwrap();
 
 
     /* Configure SPI */
@@ -185,25 +171,36 @@ fn main() -> ! {
         &mut clocks,
     );
     #[cfg(feature = "esp32c3")]
-    let spi = spi::Spi::new(
+    let spi = Spi::new(
         peripherals.SPI2,
         sck,
         mosi,
         miso,
         cs,
-        80u32.MHz(),
-        spi::SpiMode::Mode0,
+        100u32.MHz(),
+        SpiMode::Mode0,
         &mut system.peripheral_clock_control,
         &mut clocks,
-    );
+    )
+    .with_dma(dma_channel.configure(
+        false,
+        &mut descriptors,
+        &mut rx_descriptors,
+        DmaPriority::Priority0,
+    ));
 
     let di = SPIInterfaceNoCS::new(spi, dc.into_push_pull_output());
     let reset = rst.into_push_pull_output();
     let mut delay = Delay::new(&clocks);
-    #[cfg(feature = "ili9341")]
-    let mut display = Ili9341::new(di, reset, &mut delay, KalugaOrientation::Landscape, DisplaySize240x320).unwrap();
-    #[cfg(feature = "st7789")]
-    let mut display = st7789::ST7789::new(di, reset, 240, 240);
+
+    println!("About to initialize display via mipidsi...");
+
+    let mut display = mipidsi::Builder::ili9341_rgb565(di)
+        .with_display_size(240 as u16, 320 as u16)
+        .with_framebuffer_size(240 as u16, 320 as u16)
+        .with_orientation(Orientation::Landscape(true))
+        .init(&mut delay, Some(reset))
+        .unwrap();
 
     #[cfg(feature = "st7789")]
     display.init(&mut delay).unwrap();
@@ -228,5 +225,41 @@ fn main() -> ! {
     .draw(&mut display)
     .unwrap();
 
+    delay.delay_ms(2000 as u32);
+
+    display.clear(Rgb565::WHITE).unwrap();
+
+    let start_timestamp = SystemTimer::now();
+
+    let default_style = MonoTextStyleBuilder::new()
+        .font(&FONT_10X20)
+        .text_color(RgbColor::BLACK)
+        .build();
+
+    let mut vt;
+    let mut x;
+    let mut y;
+    for i in 0..13200 {
+        vt = i as f64 / (20.0 * PI as f64);
+        if i < 8000 {
+            x = (vt - 50.0) * sin(vt);
+        } else {
+            x = (vt + 20.0) * sin(vt);
+        }
+        y = (vt - 50.0) * cos(vt);
+        if i < 8000 {
+            Text::with_alignment("'", Point::new((x + 160.0) as i32, (y + 125.0) as i32), default_style,  Alignment::Center)
+                .draw(&mut display)
+                .unwrap();
+        } else {
+            Text::with_alignment("|", Point::new((x + 160.0) as i32, (y + 125.0) as i32), default_style,  Alignment::Center)
+                .draw(&mut display)
+                .unwrap();
+        }
+    }
+
+    let end_timestamp = SystemTimer::now();
+
+    println!("Rendering took : {}ms", (end_timestamp - start_timestamp)/ 100000 );
     loop {}
 }
