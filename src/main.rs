@@ -12,7 +12,7 @@ use esp32c3_hal as hal;
 
 use hal::{
     clock::ClockControl,
-    pac::Peripherals,
+    peripherals::Peripherals,
     prelude::*,
     spi,
     timer::TimerGroup,
@@ -79,7 +79,7 @@ impl ili9341::Mode for KalugaOrientation {
 
 #[entry]
 fn main() -> ! {
-    let peripherals = Peripherals::take().unwrap();
+    let peripherals = Peripherals::take();
 
     #[cfg(any(feature = "esp32"))]
     let mut system = peripherals.DPORT.split();
