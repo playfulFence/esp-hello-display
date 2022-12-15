@@ -181,13 +181,7 @@ fn main() -> ! {
         SpiMode::Mode0,
         &mut system.peripheral_clock_control,
         &mut clocks,
-    )
-    .with_dma(dma_channel.configure(
-        false,
-        &mut descriptors,
-        &mut rx_descriptors,
-        DmaPriority::Priority0,
-    ));
+    );
 
     let di = SPIInterfaceNoCS::new(spi, dc.into_push_pull_output());
     let reset = rst.into_push_pull_output();
