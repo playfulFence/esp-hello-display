@@ -51,7 +51,8 @@ esp-println = { version = "0.2.1", features = [ "esp32c3" ] }
 
 
 [dependencies]
-mipidsi = { git = "https://github.com/georgik/mipidsi", branch = "feature/ili9341" }
+mipidsi = { git = "https://github.com/almindor/mipidsi"}
+embedded-graphics-framebuf = "0.2.0"
 st7789 = "0.6"
 profont = "0.6.1"
 embedded-graphics = "0.7.1"

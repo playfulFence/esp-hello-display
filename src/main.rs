@@ -11,7 +11,7 @@ use esp32s3_hal as hal;
 use esp32c3_hal as hal;
 
 use hal::{
-    clock::ClockControl,
+    clock::{ClockControl, CpuClock},
     peripherals::Peripherals,
     dma::DmaPriority,
     gdma::Gdma,
@@ -38,6 +38,7 @@ use embedded_graphics::image::Image;
 use embedded_graphics::geometry::*;
 use embedded_graphics::draw_target::DrawTarget;
 use embedded_graphics::mono_font::{ascii::FONT_10X20, MonoTextStyleBuilder};
+use embedded_graphics_framebuf::FrameBuf;
 
 use profont::{PROFONT_24_POINT, PROFONT_18_POINT};
 
@@ -65,7 +66,7 @@ fn main() -> ! {
     #[cfg(any(feature = "esp32s2", feature = "esp32s3", feature = "esp32c3"))]
     let mut system = peripherals.SYSTEM.split();
 
-    let mut clocks = ClockControl::boot_defaults(system.clock_control).freeze();
+    let mut clocks = ClockControl::configure(system.clock_control, CpuClock::Clock160MHz).freeze();
 
     // Disable the RTC and TIMG watchdog timers
     let mut rtc = Rtc::new(peripherals.RTC_CNTL);
@@ -196,6 +197,11 @@ fn main() -> ! {
         .init(&mut delay, Some(reset))
         .unwrap();
 
+
+    let mut data = [Rgb565::WHITE; 320 * 240];
+
+    let mut fbuf = FrameBuf::new(&mut data, 320, 240);
+
     #[cfg(feature = "st7789")]
     display.init(&mut delay).unwrap();
     #[cfg(feature = "st7789")]
@@ -204,7 +210,7 @@ fn main() -> ! {
 
     println!("Initialized");
 
-    display.clear(Rgb565::WHITE).unwrap();
+    // display.clear(Rgb565::WHITE).unwrap();
 
     #[cfg(feature = "st7789")]
     Text::new("Display initialized",
@@ -216,42 +222,154 @@ fn main() -> ! {
     Text::new("Display initialized",
               display.bounding_box().center() - Size::new(display.bounding_box().size.width/2 - 10, 0), 
               MonoTextStyle::new(&PROFONT_24_POINT, Rgb565::BLACK))
-    .draw(&mut display)
+    .draw(&mut fbuf)
     .unwrap();
+    display.draw_iter(fbuf.into_iter()).unwrap();
 
     delay.delay_ms(2000 as u32);
 
-    display.clear(Rgb565::WHITE).unwrap();
+    fbuf.clear(Rgb565::WHITE).unwrap();
 
     let start_timestamp = SystemTimer::now();
 
+    
+
+    fbuf.clear(Rgb565::WHITE);
     let default_style = MonoTextStyleBuilder::new()
-        .font(&FONT_10X20)
-        .text_color(RgbColor::BLACK)
-        .build();
+                    .font(&FONT_10X20)
+                    .text_color(RgbColor::BLACK)
+                    .build();
 
-    let mut vt;
-    let mut x;
-    let mut y;
-    for i in 0..13200 {
-        vt = i as f64 / (20.0 * PI as f64);
-        if i < 8000 {
-            x = (vt - 50.0) * sin(vt);
-        } else {
-            x = (vt + 20.0) * sin(vt);
-        }
-        y = (vt - 50.0) * cos(vt);
-        if i < 8000 {
-            Text::with_alignment("'", Point::new((x + 160.0) as i32, (y + 125.0) as i32), default_style,  Alignment::Center)
-                .draw(&mut display)
-                .unwrap();
-        } else {
-            Text::with_alignment("|", Point::new((x + 160.0) as i32, (y + 125.0) as i32), default_style,  Alignment::Center)
-                .draw(&mut display)
-                .unwrap();
-        }
-    }
+                let mut n = 6.0;
+                let mut d = 71.0;    
+                let mut a;
+                let mut r;
+                let mut x;
+                let mut y;
 
+                for t in 0..361 {
+                    a = t as f64 * d * (PI as f64 / 60.0);
+                    r = 30.0 * sin(n * a);
+                    x = r * cos(a);
+                    y = r * sin(a);
+
+                    Text::with_alignment("o", Point::new((x + 35.0) as i32, (y + 180.0) as i32), default_style,  Alignment::Center)
+                        .draw(&mut fbuf)
+                        .unwrap();
+                }
+                display.draw_iter(fbuf.into_iter()).unwrap();
+                let pos_x = 1;
+                for pos_y in 0..60 {
+                    Text::with_alignment("|", Point::new(pos_x + 34, pos_y + 180), default_style,  Alignment::Center)
+                        .draw(&mut fbuf)
+                        .unwrap();
+                }
+                display.draw_iter(fbuf.into_iter()).unwrap();
+
+                n = 7.0;
+                d = 19.0;
+                for t in 0..700 {
+                    a = t as f64 * d * (PI as f64 / 300.0);
+                    r = 30.0 * sin(n * a);
+                    x = r * cos(a);
+                    y = r * sin(a);
+
+                    Text::with_alignment("o", Point::new((x + 90.0) as i32, (y + 140.0) as i32), default_style,  Alignment::Center)
+                        .draw(&mut fbuf)
+                        .unwrap();
+                }
+                display.draw_iter(fbuf.into_iter()).unwrap();
+
+                for pos_y in 0..100 {
+                    Text::with_alignment("|", Point::new(pos_x + 89, pos_y + 140), default_style,  Alignment::Center)
+                        .draw(&mut fbuf)
+                        .unwrap();
+                }
+                display.draw_iter(fbuf.into_iter()).unwrap();
+
+                n = 2.0;
+                d = 39.0;
+                for t in 0..500 {
+                    a = t as f64 * d * (PI as f64 / 150.0);
+                    r = 30.0 * sin(n * a);
+                    x = r * cos(a);
+                    y = r * sin(a);
+
+                    Text::with_alignment("S", Point::new((x + 140.0) as i32, (y + 190.0) as i32), default_style,  Alignment::Center)
+                        .draw(&mut fbuf)
+                        .unwrap();
+                }
+                display.draw_iter(fbuf.into_iter()).unwrap();
+
+                for pos_y in 0..50 {
+                    Text::with_alignment("|", Point::new(pos_x + 139, pos_y + 190), default_style,  Alignment::Center)
+                        .draw(&mut fbuf)
+                        .unwrap();
+                }
+                display.draw_iter(fbuf.into_iter()).unwrap();
+
+                n = 8.0;
+                d = 27.0;
+                for t in 0..1000 {
+                    a = t as f64 * d * (PI as f64 / 230.0);
+                    r = 30.0 * sin(n * a);
+                    x = r * cos(a);
+                    y = r * sin(a);
+
+                    Text::with_alignment("o", Point::new((x + 243.0) as i32, (y + 200.0) as i32), default_style,  Alignment::Center)
+                        .draw(&mut fbuf)
+                        .unwrap();
+                }
+                display.draw_iter(fbuf.into_iter()).unwrap();
+                for pos_y in 0..85 {
+                    Text::with_alignment("|", Point::new(pos_x + 242, pos_y + 200), default_style,  Alignment::Center)
+                        .draw(&mut fbuf)
+                        .unwrap();
+                }
+                display.draw_iter(fbuf.into_iter()).unwrap();
+
+                n = 5.0;
+                d = 97.0;
+                for t in 0..700 {
+                    a = t as f64 * d * (PI as f64 / 150.0);
+                    r = 30.0 * sin(n * a);
+                    x = r * cos(a);
+                    y = r * sin(a);
+
+                    Text::with_alignment("o", Point::new((x + 290.0) as i32, (y + 155.0) as i32), default_style,  Alignment::Center)
+                        .draw(&mut fbuf)
+                        .unwrap();
+                }
+                display.draw_iter(fbuf.into_iter()).unwrap();
+                for pos_y in 0..85 {
+                    Text::with_alignment("|", Point::new(pos_x + 289, pos_y + 155), default_style,  Alignment::Center)
+                        .draw(&mut fbuf)
+                        .unwrap();
+                }
+                display.draw_iter(fbuf.into_iter()).unwrap();
+
+                n = 6.0;
+                d = 71.0;
+                for t in 0..2500 {
+                    a = t as f64 * d * (PI as f64 / 1200.0);
+                    r = 80.0 * sin(n * a);
+                    x = r * cos(a);
+                    y = r * sin(a);
+
+                    Text::with_alignment("o", Point::new((x + 200.0) as i32, (y + 90.0) as i32), default_style,  Alignment::Center)
+                        .draw(&mut fbuf)
+                        .unwrap();
+                }
+                display.draw_iter(fbuf.into_iter()).unwrap();
+
+                for pos_y in 0..100 {
+                    Text::with_alignment("|", Point::new(pos_x + 199, pos_y + 140), default_style,  Alignment::Center)
+                        .draw(&mut fbuf)
+                        .unwrap();
+                }
+                display.draw_iter(fbuf.into_iter()).unwrap();
+
+                
     let end_timestamp = SystemTimer::now();
 
     println!("Rendering took : {}ms", (end_timestamp - start_timestamp)/ 100000 );
