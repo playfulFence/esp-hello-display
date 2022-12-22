@@ -183,6 +183,8 @@ fn main() -> ! {
         &mut system.peripheral_clock_control,
         &mut clocks,
     );
+    
+
 
     let di = SPIInterfaceNoCS::new(spi, dc.into_push_pull_output());
     let reset = rst.into_push_pull_output();

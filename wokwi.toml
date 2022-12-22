@@ -1,0 +1,4 @@
+[wokwi]
+version = 1
+elf = "target/riscv32imac-unknown-none-elf/release/esp-hello-display"
+firmware = "target/riscv32imac-unknown-none-elf/release/esp-hello-display"
