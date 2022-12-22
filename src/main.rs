@@ -22,10 +22,7 @@ use hal::{
 };
 
 /* Display and graphics */
-#[cfg(feature = "ili9341")]
-use ili9341::{DisplaySize240x320, Ili9341, Orientation};
-#[cfg(feature = "st7789")]
-use st7789::*;
+use mipidsi::{ Orientation, ColorOrder };
 
 use display_interface_spi::SPIInterfaceNoCS;
 
@@ -37,55 +34,21 @@ use embedded_graphics::text::*;
 use embedded_graphics::image::Image;
 use embedded_graphics::geometry::*;
 use embedded_graphics::draw_target::DrawTarget;
+use embedded_hal;
+
 
 use profont::{PROFONT_24_POINT, PROFONT_18_POINT};
 
-
-
-#[cfg(feature="xtensa-lx-rt")]
-use xtensa_lx_rt::entry;
-#[cfg(feature="riscv-rt")]
+use riscv_rt;
 use riscv_rt::entry;
 
 use esp_println::println;
 use esp_backtrace as _;
 
-
-/* Some stuff for correct orientation and color on ILI9341 */
-pub enum KalugaOrientation {
-    Portrait,
-    PortraitFlipped,
-    Landscape,
-    LandscapeVericallyFlipped,
-    LandscapeFlipped,
-}
-
-impl ili9341::Mode for KalugaOrientation {
-    fn mode(&self) -> u8 {
-        match self {
-            Self::Portrait => 0,
-            Self::LandscapeVericallyFlipped => 0x20,
-            Self::Landscape => 0x20 | 0x40,
-            Self::PortraitFlipped => 0x80 | 0x40,
-            Self::LandscapeFlipped => 0x80 | 0x20,
-        }
-    }
-
-    fn is_landscape(&self) -> bool {
-        matches!(self, Self::Landscape | Self::LandscapeFlipped | Self::LandscapeVericallyFlipped)
-    }
-}
-
-
 #[entry]
 fn main() -> ! {
     let peripherals = Peripherals::take();
-
-    #[cfg(any(feature = "esp32"))]
-    let mut system = peripherals.DPORT.split();
-    #[cfg(any(feature = "esp32s2", feature = "esp32s3", feature = "esp32c3"))]
     let mut system = peripherals.SYSTEM.split();
-
     let mut clocks = ClockControl::boot_defaults(system.clock_control).freeze();
 
     // Disable the RTC and TIMG watchdog timers
@@ -99,60 +62,17 @@ fn main() -> ! {
     wdt0.disable();
     wdt1.disable();
 
-
     println!("About to initialize the SPI LED driver ILI9341");
     let io = IO::new(peripherals.GPIO, peripherals.IO_MUX);
-    
 
     /* Set corresponding pins */
-    #[cfg(feature = "esp32")]
-    let mosi = io.pins.gpio23;
-    #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
     let mosi = io.pins.gpio7;
-    #[cfg(feature = "esp32c3")]
-    let mosi = io.pins.gpio7;
-
-    #[cfg(feature = "esp32")]
-    let cs = io.pins.gpio22;
-    #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
-    let cs = io.pins.gpio5;
-    #[cfg(feature = "esp32c3")]
-    let cs = io.pins.gpio20;
-
-    #[cfg(feature = "esp32")]
-    let rst = io.pins.gpio18;
-    #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
-    let rst = io.pins.gpio18;
-    #[cfg(feature = "esp32c3")]
-    let rst = io.pins.gpio3;
-
-    #[cfg(feature = "esp32")]
-    let dc = io.pins.gpio21;
-    #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
-    let dc = io.pins.gpio4;
-    #[cfg(feature = "esp32c3")] 
-    let dc = io.pins.gpio21;
-
-    #[cfg(feature = "esp32")]
-    let sck = io.pins.gpio19;
-    #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
+    let cs = io.pins.gpio2;
+    let rst = io.pins.gpio10;
+    let dc = io.pins.gpio3;
     let sck = io.pins.gpio6;
-    #[cfg(feature = "esp32c3")]
-    let sck = io.pins.gpio6;
-
-    #[cfg(feature = "esp32")]
-    let miso = io.pins.gpio25;
-    #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
-    let miso = io.pins.gpio12;
-    #[cfg(feature = "esp32c3")]
     let miso = io.pins.gpio8;
-
-    #[cfg(feature = "esp32")]
-    let mut backlight = io.pins.gpio5.into_push_pull_output();
-    #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
-    let mut backlight = io.pins.gpio9.into_push_pull_output();
-    #[cfg(feature = "esp32c3")]
-    let mut backlight = io.pins.gpio0.into_push_pull_output();
+    let backlight = io.pins.gpio4;
 
     /* Then set backlight (set_low() - display lights up when signal is in 0, set_high() - opposite case(for example.)) */
     let mut backlight = backlight.into_push_pull_output();
@@ -160,9 +80,8 @@ fn main() -> ! {
 
 
     /* Configure SPI */
-    #[cfg(feature = "esp32")]
     let spi = spi::Spi::new(
-        peripherals.SPI3,
+        peripherals.SPI2,
         sck,
         mosi,
         miso,
@@ -172,56 +91,25 @@ fn main() -> ! {
         &mut system.peripheral_clock_control,
         &mut clocks,
     );
-    #[cfg(any(feature = "esp32s2", feature = "esp32s3"))]
-    let spi = spi::Spi::new(
-        peripherals.SPI2,
-        sck,
-        mosi,
-        miso,
-        cs,
-        80u32.MHz(),
-        spi::SpiMode::Mode0,
-        &mut system.peripheral_clock_control,
-        &mut clocks,
-    );
-    #[cfg(feature = "esp32c3")]
-    let spi = spi::Spi::new(
-        peripherals.SPI2,
-        sck,
-        mosi,
-        miso,
-        cs,
-        80u32.MHz(),
-        spi::SpiMode::Mode0,
-        &mut system.peripheral_clock_control,
-        &mut clocks,
-    );
 
     let di = SPIInterfaceNoCS::new(spi, dc.into_push_pull_output());
     let reset = rst.into_push_pull_output();
     let mut delay = Delay::new(&clocks);
-    #[cfg(feature = "ili9341")]
-    let mut display = Ili9341::new(di, reset, &mut delay, KalugaOrientation::Landscape, DisplaySize240x320).unwrap();
-    #[cfg(feature = "st7789")]
-    let mut display = st7789::ST7789::new(di, reset, 240, 240);
-
-    #[cfg(feature = "st7789")]
-    display.init(&mut delay).unwrap();
-    #[cfg(feature = "st7789")]
-    display.set_orientation(st7789::Orientation::Portrait).unwrap();
     
+    let mut display = mipidsi::Builder::ili9341_rgb565(di)
+        .with_display_size(240 as u16, 320 as u16)
+        .with_framebuffer_size(240 as u16, 320 as u16)
+        .with_orientation(Orientation::LandscapeInverted(true))
+        .with_color_order(ColorOrder::Bgr)
+        .init(&mut delay, Some(reset))
+    .unwrap();
+        
+
 
     println!("Initialized");
 
     display.clear(Rgb565::WHITE).unwrap();
 
-    #[cfg(feature = "st7789")]
-    Text::new("Display initialized",
-              display.bounding_box().center() - Size::new(display.bounding_box().size.width/2 - 10, 0), 
-              MonoTextStyle::new(&PROFONT_18_POINT, Rgb565::BLACK))
-    .draw(&mut display)
-    .unwrap();
-    #[cfg(feature = "ili9341")]
     Text::new("Display initialized",
               display.bounding_box().center() - Size::new(display.bounding_box().size.width/2 - 10, 0), 
               MonoTextStyle::new(&PROFONT_24_POINT, Rgb565::BLACK))

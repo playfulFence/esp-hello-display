@@ -1,0 +1,36 @@
+{
+    "version": 1,
+    "author": "Kirill Mikhailov [playfulFence]",
+    "editor": "wokwi",
+    "parts": [
+      {
+        "type": "board-esp32-c3-devkitm-1",
+        "id": "esp",
+        "top": -305.03,
+        "left": -54.29,
+        "attrs": { "builder": "rust-nostd-esp" }
+      },
+      {
+        "type": "wokwi-ili9341",
+        "id": "lcd1",
+        "top": -348.99,
+        "left": -375.2,
+        "rotate": 270,
+        "attrs": { "flipVertical": "1" }
+      }
+    ],
+    "connections": [
+      [ "esp:TX", "$serialMonitor:RX", "", [] ],
+      [ "esp:RX", "$serialMonitor:TX", "", [] ],
+      [ "esp:7", "lcd1:MOSI", "white", [ "h25.67", "v-128.97", "h-182.01", "v129.83" ] ],
+      [ "esp:2", "lcd1:CS", "green", [ "h-48.18", "v59.43" ] ],
+      [ "esp:10", "lcd1:RST", "yellow", [ "v0" ] ],
+      [ "esp:3", "lcd1:D/C", "purple", [ "h-21.57", "v47.08" ] ],
+      [ "esp:6", "lcd1:SCK", "blue", [ "h39.74", "v-150.63", "h-211.92", "v-1.93" ] ],
+      [ "esp:8", "lcd1:MISO", "red", [ "h17.54", "v-98.17", "h-162.68", "v97.03" ] ],
+      [ "esp:4", "lcd1:LED", "magenta", [ "v-0.39", "h52.29", "v-184.89", "h-216.27", "v149.17" ] ],
+      [ "esp:GND.1", "lcd1:GND", "black", [ "v-0.77", "h-35.66", "v130" ] ],
+      [ "esp:3V3.1", "lcd1:VCC", "limegreen", [ "h-28.99", "v115.64" ] ]
+    ],
+    "serialMonitor": { "display": "terminal" }
+  }

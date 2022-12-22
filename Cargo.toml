@@ -51,13 +51,15 @@ esp-println = { version = "0.2.1", features = [ "esp32c3" ] }
 
 
 [dependencies]
-ili9341 = { version = "0.5", git = "https://github.com/yuri91/ili9341-rs" }
+mipidsi = { git = "https://github.com/almindor/mipidsi" }
 st7789 = "0.6"
 profont = "0.6.1"
+embedded-hal = "0.2.7"
 embedded-graphics = "0.7.1"
 embedded-graphics-core = "0.3.3"
 display-interface = "0.4"
 display-interface-spi = "0.4"
+libm = "0.2.5"
 
 [features]
 # default = [ "rt" ]
