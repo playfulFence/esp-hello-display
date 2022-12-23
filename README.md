@@ -24,9 +24,8 @@ In case you will have additional questions - feel free to open an issue :wink:
 
 ## Description
 There's a short example for newcomers that shows, how the display is initialised on different Espressif boards (ESP32, ESP32S2, ESP32C3) in bare-metal <br>
-Initially, there were three examples on Wokwi only (without Gitpod), but it requires local builder, what is relatively difficult to explain to newcomer (I'll do a separate repository for this one day). 
+This separate config shows specifically case with `ESP32C3` and display, you can find brief instuctions above for other chips
 <br>
-Anyway, we're already working on including [esp-hal](https://github.com/esp-rs/esp-hal) drivers for building it in Wokwi without using local builder, so you need just to wait a little :heart:
 
 >### **Important** : below in this branch you can find pin connection for REAL hardware, not for Wokwi. Pin connection for every chip for Wokwi can be found in corresponding branches
 
