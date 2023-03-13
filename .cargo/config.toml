@@ -13,9 +13,12 @@ rustflags = [
   "-C", "link-arg=-Wl,-Tlinkall.x",
 ]
 
-[target.riscv32imac-unknown-none-elf]
+[target.riscv32imc-unknown-none-elf]
 rustflags = [
-  "-C", "link-arg=-Tlinkall.x",
+    "-C", "link-arg=-Tlinkall.x",
+    "-C", "link-arg=-Trom_functions.x",
+
+    "-C", "force-frame-pointers",
 ]
 
 # Uncomment the target if you'd like to use automatic code hinting in your IDE

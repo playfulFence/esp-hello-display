@@ -7,82 +7,73 @@ license = "MIT OR Apache-2.0"
 
 
 [target.xtensa-esp32-none-elf.dependencies]
-xtensa-atomic-emulation-trap = "0.2.0"
-esp32-hal = { package = "esp32-hal", git = "https://github.com/esp-rs/esp-hal.git" }
+xtensa-atomic-emulation-trap = "0.3.1"
+esp32-hal = { version = "0.10.0", optional = true, features = [ "rt" ] }
 esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", features = [
     "esp32",
     "panic-handler",
     "print-uart",
 ] }
-xtensa-lx-rt = { version = "0.12.0", features = ["esp32"], optional = true }
-esp-println = { version = "0.2.1", features = [ "esp32" ] }
+xtensa-lx-rt = { version = "0.14.0", features = ["esp32"], optional = true }
+esp-println = { version = "0.3.1", features = [ "esp32" ] }
+# esp-wifi = { version = "0.1.0", git = "https://github.com/esp-rs/esp-wifi", package = "esp-wifi", features = ["esp32","esp32-async", "esp-now"]}
 
 [target.xtensa-esp32s2-none-elf.dependencies]
-xtensa-atomic-emulation-trap = "0.2.0"
-esp32s2-hal = { package = "esp32s2-hal", git = "https://github.com/esp-rs/esp-hal.git" }
+# esp-wifi = { version = "0.1.0", git = "https://github.com/esp-rs/esp-wifi", package = "esp-wifi", features = ["esp32s2","esp32s2-async", "esp-now"]}
+xtensa-atomic-emulation-trap = "0.3.1"
+esp32s2-hal = { version = "0.7.0", optional = true, features = [ "rt" ] }
 esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", features = [
     "esp32s2",
     "panic-handler",
     "print-uart",
 ] }
-xtensa-lx-rt = { version = "0.13.0", features = ["esp32s2"], optional = true }
-esp-println = { version = "0.2.1", features = [ "esp32s2" ] }
+xtensa-lx-rt = { version = "0.14.0", features = ["esp32s2"], optional = true }
+esp-println = { version = "0.3.1", features = [ "esp32s2" ] }
 
 [target.xtensa-esp32s3-none-elf.dependencies]
-xtensa-atomic-emulation-trap = "0.2.0"
-esp32s3-hal = { package = "esp32s3-hal", git = "https://github.com/esp-rs/esp-hal.git" }
+# esp-wifi = {git = "https://github.com/esp-rs/esp-wifi", package = "esp-wifi", features = ["esp32s3","esp32s3-async", "esp-now"]}
+xtensa-atomic-emulation-trap = "0.3.1"
+esp32s3-hal = { version = "0.7.0", optional = true, features = [ "rt" ] }
 esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", features = [
     "esp32s3",
     "panic-handler",
     "print-uart",
 ] }
-xtensa-lx-rt = { version = "0.12.0", features = ["esp32s3"], optional = true }
-esp-println = { version = "0.2.1", features = [ "esp32s3" ] }
+xtensa-lx-rt = { version = "0.14.0", features = ["esp32s3"], optional = true }
+esp-println = { version = "0.3.1", features = [ "esp32s3" ] }
 
-[target.riscv32imac-unknown-none-elf.dependencies]
-esp32c3-hal = { package = "esp32c3-hal", git = "https://github.com/esp-rs/esp-hal.git" }
-esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", features = [
+[target.riscv32imc-unknown-none-elf.dependencies]
+esp32c3-hal = { version = "0.7.0", optional = true }
+# esp-wifi = {git = "https://github.com/esp-rs/esp-wifi", package = "esp-wifi", features = ["esp32c3","esp32c3-async", "esp-now"]}
+esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", version = "0.6.0", features = [
     "esp32c3",
     "panic-handler",
     "print-uart",
 ] }
-riscv-rt = { version = "0.8", optional = true }
-esp-println = { version = "0.2.1", features = [ "esp32c3" ] }
+esp-println = { version = "0.4.0", features = [ "esp32c3" ] }
 
 
 [dependencies]
-ili9341 = { version = "0.5", git = "https://github.com/yuri91/ili9341-rs" }
-st7789 = "0.6"
+mipidsi = { git = "https://github.com/almindor/mipidsi" }
+st7789 = "0.7.0"
 profont = "0.6.1"
+embedded-hal = "0.2.7"
 embedded-graphics = "0.7.1"
 embedded-graphics-core = "0.3.3"
-display-interface = "0.4"
-display-interface-spi = "0.4"
+display-interface = "0.4.1"
+display-interface-spi = "0.4.1"
+libm = "0.2.6"
 
 [features]
-# default = [ "rt" ]
-# default = [ "rt", "esp32_ili9341"]
-# default = [ "rt", "esp32s2_ili9341"]
-default = [ "rt", "esp32c3_ili9341"]
-# default = [ "rt", "esp32s3_usb_otg" ]
-#rt = ["xtensa-lx-rt"] # for esp32 and esp32s2 chips
-rt = ["riscv-rt"] # for esp32c3 chip
-# eh1 = []
-#eh1 = ["esp32-hal/eh1"]
-# eh1 = ["esp32s2-hal/eh1"]
-eh1 = ["esp32c3-hal/eh1"]
+default = [ "rt", "eh1", "ili9341"]
+rt = [ ]
+# eh1 = ["esp32-hal/eh1", "esp32"]
+# eh1 = ["esp32s2-hal/eh1", "esp32s2"]
+# eh1 = ["esp32s3-hal/eh1", "esp32s3"]
+eh1 = ["esp32c3-hal/eh1", "esp32c3"]
 
 esp32 = []
-esp32s2 = [ ]
-esp32s3 = [  ]
-esp32c3 = [  ]
-
+esp32s2 = []
+esp32s3 = []
+esp32c3 = []
 ili9341 = []
-st7789 = []
- 
-esp32c3_ili9341 = [ "riscv-rt", "esp32c3", "eh1", "ili9341" ]
-esp32s2_ili9341 = [ "xtensa-lx-rt", "esp32s2", "eh1", "ili9341" ]
-esp32_ili9341 = [ "xtensa-lx-rt", "esp32", "eh1", "ili9341" ]
-esp32s3_usb_otg = [ "xtensa-lx-rt", "esp32s3", "st7789"]
-
-
