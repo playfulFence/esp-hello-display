@@ -19,6 +19,7 @@ use hal::{
     Rtc,
     IO,
     Delay,
+    Rng,
 };
 
 /* Display and graphics */
@@ -39,6 +40,9 @@ use profont::{PROFONT_24_POINT, PROFONT_18_POINT};
 
 use esp_println::println;
 use esp_backtrace as _;
+
+use esp_wifi::esp_now::{EspNow, PeerInfo, BROADCAST_ADDRESS};
+use esp_wifi::initialize;
 
 #[cfg(any(feature = "esp32c3", feature = "esp32c2"))]
 use hal::system::SystemExt;
@@ -76,6 +80,7 @@ fn main() -> ! {
     rtc.swd.disable();
 
     rtc.rwdt.disable();
+
 
 
     println!("About to initialize the SPI LED driver ILI9341");
@@ -134,7 +139,7 @@ fn main() -> ! {
 
     /* Then set backlight (set_low() - display lights up when signal is in 0, set_high() - opposite case(for example.)) */
     let mut backlight = backlight.into_push_pull_output();
-    backlight.set_low().unwrap();
+    //backlight.set_low().unwrap();
 
 
     /* Configure SPI */
@@ -205,5 +210,56 @@ fn main() -> ! {
     .draw(&mut display)
     .unwrap();
 
-    loop {}
+    #[cfg(any(feature = "esp32c3"))]
+    {
+        use hal::systimer::SystemTimer;
+        let syst = SystemTimer::new(peripherals.SYSTIMER);
+        initialize(syst.alarm0, Rng::new(peripherals.RNG), &clocks).unwrap();
+    }
+
+    println!("Initializing esp-now");
+    let mut esp_now = esp_wifi::esp_now::esp_now().initialize().unwrap();
+    println!("esp-now version {}", esp_now.get_version().unwrap());
+
+
+    loop {
+        delay.delay_ms(2000 as u32);
+        let r = esp_now.receive();
+        if let Some(r) = r {
+            //println!("Received {:x?}", r);
+            let rec_bytes = r.get_data();
+
+            let x_bits = ((rec_bytes[0] as u32) << 24)
+                | ((rec_bytes[1] as u32) << 16)
+                | ((rec_bytes[2] as u32) << 8);
+
+
+            let y_bits = ((rec_bytes[3] as u32) << 24)
+                | ((rec_bytes[4] as u32) << 16)
+                | ((rec_bytes[5] as u32) << 8);
+
+            let z_bits = ((rec_bytes[6] as u32) << 24)
+                | ((rec_bytes[7] as u32) << 16)
+                | ((rec_bytes[8] as u32) << 8);
+
+            println!("Recieved: x:{:x?}, y:{:x?}, z:{:x?} ", f32::from_bits(x_bits), f32::from_bits(y_bits), f32::from_bits(z_bits));
+
+            if r.info.dst_address == BROADCAST_ADDRESS {
+                if !esp_now.peer_exists(&r.info.src_address).unwrap() {
+                    esp_now
+                        .add_peer(PeerInfo {
+                            peer_address: r.info.src_address,
+                            lmk: None,
+                            channel: None,
+                            encrypt: false,
+                        })
+                        .unwrap();
+                }
+                //esp_now.send(&r.info.src_address, b"Hello Peer").unwrap();
+            }
+        }
+        else {
+            esp_now.send(&BROADCAST_ADDRESS, b"WAITING FOR MESSAGES").unwrap();
+        } 
+    }
 }

@@ -16,10 +16,10 @@ esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", features = [
 ] }
 xtensa-lx-rt = { version = "0.14.0", features = ["esp32"], optional = true }
 esp-println = { version = "0.3.1", features = [ "esp32" ] }
-# esp-wifi = { version = "0.1.0", git = "https://github.com/esp-rs/esp-wifi", package = "esp-wifi", features = ["esp32","esp32-async", "esp-now"]}
+esp-wifi = { version = "0.1.0", git = "https://github.com/esp-rs/esp-wifi", package = "esp-wifi", features = ["esp32","esp32-async", "esp-now"]}
 
 [target.xtensa-esp32s2-none-elf.dependencies]
-# esp-wifi = { version = "0.1.0", git = "https://github.com/esp-rs/esp-wifi", package = "esp-wifi", features = ["esp32s2","esp32s2-async", "esp-now"]}
+esp-wifi = { version = "0.1.0", git = "https://github.com/esp-rs/esp-wifi", package = "esp-wifi", features = ["esp32s2","esp32s2-async", "esp-now"]}
 xtensa-atomic-emulation-trap = "0.3.1"
 esp32s2-hal = { version = "0.7.0", optional = true, features = [ "rt" ] }
 esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", features = [
@@ -31,7 +31,7 @@ xtensa-lx-rt = { version = "0.14.0", features = ["esp32s2"], optional = true }
 esp-println = { version = "0.3.1", features = [ "esp32s2" ] }
 
 [target.xtensa-esp32s3-none-elf.dependencies]
-# esp-wifi = {git = "https://github.com/esp-rs/esp-wifi", package = "esp-wifi", features = ["esp32s3","esp32s3-async", "esp-now"]}
+esp-wifi = {git = "https://github.com/esp-rs/esp-wifi", package = "esp-wifi", features = ["esp32s3","esp32s3-async", "esp-now"]}
 xtensa-atomic-emulation-trap = "0.3.1"
 esp32s3-hal = { version = "0.7.0", optional = true, features = [ "rt" ] }
 esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", features = [
@@ -44,7 +44,7 @@ esp-println = { version = "0.3.1", features = [ "esp32s3" ] }
 
 [target.riscv32imc-unknown-none-elf.dependencies]
 esp32c3-hal = { version = "0.7.0", optional = true }
-# esp-wifi = {git = "https://github.com/esp-rs/esp-wifi", package = "esp-wifi", features = ["esp32c3","esp32c3-async", "esp-now"]}
+esp-wifi = {git = "https://github.com/esp-rs/esp-wifi", package = "esp-wifi", features = ["esp32c3","esp32c3-async", "esp-now"]}
 esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", version = "0.6.0", features = [
     "esp32c3",
     "panic-handler",
